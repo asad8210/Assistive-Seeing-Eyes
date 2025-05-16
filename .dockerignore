@@ -1,1 +1,20 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+out
+.env
+.env*.local
+.vscode
+*.tgz
+*.log
+# Git files
+.git
+.gitignore
 
+# Capacitor files (if you were using it, but good to keep for general .dockerignore)
+android/
+ios/
+capacitor.config.*

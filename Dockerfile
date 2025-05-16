@@ -1,5 +1,5 @@
 # Stage 1: Builder - Install dependencies and build the application
-FROM node:20-s pursued slim AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
 
 # Install system dependencies required for TensorFlow.js and other packages
@@ -19,7 +19,7 @@ RUN npm install --legacy-peer-deps
 # Copy the rest of the application code
 COPY . .
 
-# Apply patches if they exist
+# Apply patches if they exist and are non-empty
 RUN if [ -d "./patches" ] && [ "$(ls -A ./patches)" ]; then npx patch-package; else echo "No patches to apply"; fi
 
 # Build the Next.js application
@@ -39,7 +39,9 @@ RUN apt-get update && \
     # Required for TensorFlow.js
     libgomp1 \
     # Required for image processing
-    libgl1 && \
+    libgl1 \
+    # Required for health check
+    curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy production node_modules from builder
@@ -50,7 +52,7 @@ COPY --from=builder /app/package*.json ./
 RUN mkdir -p \
     ./standalone-server/.next/static \
     ./src/ai \
-    /data  # Add persistent storage mount point for Render
+    /data
 
 # Copy built application files
 COPY --from=builder /app/.next/standalone ./standalone-server

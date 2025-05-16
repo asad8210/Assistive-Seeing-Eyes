@@ -1,3 +1,6 @@
+# This file is a Render Blueprint that defines the services for your application.
+# Learn more at https://render.com/docs/blueprint-spec
+
 services:
   - type: web
     name: assistive-seeing-eyes # Or your preferred service name
@@ -7,26 +10,23 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_GENKIT_API_BASE_URL
-        value: /genkit-api # Client will call this relative path
+        value: /genkit-api # Client will call this relative path for the integrated Genkit API
       - key: AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU # Your Genkit API key
         sync: false # IMPORTANT: Set the value in Render's dashboard, not from repo
     httpPort: 3000 # The port your Next.js app (served by standalone server.js) runs on inside the container
     healthCheckPath: / # Root of your Next.js app for health checks
+    # Current strategy: Integrated deployment (Next.js frontend and Genkit backend in one service)
+    # The rewrite rule below enables this by proxying client-side requests to /genkit-api/...
+    # to the Genkit server running on port 3400 within the same container.
     rewrites:
       - source: /genkit-api/(.*) # Match requests to /genkit-api/...
         destination: http://localhost:3400/$1 # Proxy to Genkit on port 3400
-    # buildFilter: # Optional: To control when Render rebuilds
-    #   paths:
-    #     - "src/**"
-    #     - "public/**" # If you have a public folder
-    #     - "package.json"
-    #     - "package-lock.json"
-    #     - "next.config.ts" # or .js
-    #     - "tsconfig.json"
-    #     - "Dockerfile"
-    #     - ".dockerignore"
-    #     - "render.yaml"
-    #   ignoredPaths:
-    #     - "README.md"
 
+    # An alternative strategy could be to deploy Next.js and Genkit as separate services.
+    # In that case:
+    # 1. This service would only run Next.js (or be a static site).
+    # 2. NEXT_PUBLIC_GENKIT_API_BASE_URL would point to the public URL of the separate Genkit service.
+    # 3. The rewrite rule above would not be needed for this Next.js service.
+    # 4. A new service would be defined in this render.yaml (or a separate one) for Genkit,
+    #    exposing its own public endpoint and handling CORS.
 #AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU

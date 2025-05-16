@@ -4,11 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
-    "genkit:dev": "node ./node_modules/genkit-cli/bin/genkit.js start --tsx src/ai/dev.ts",
-    "genkit:watch": "node ./node_modules/genkit-cli/bin/genkit.js start --tsx --watch src/ai/dev.ts",
+    "genkit:dev": "genkit start --tsx src/ai/dev.ts",
+    "genkit:prod": "genkit start --port 3400 --tsx src/ai/dev.ts",
+    "genkit:watch": "genkit start --tsx --watch src/ai/dev.ts",
     "build": "next build",
-    "start": "concurrently --kill-others --names \"NEXT,GENKIT\" \"node ./standalone-server/server.js -p 3000\" \"node ./node_modules/.bin/genkit start --port 3400 --tsx src/ai/dev.ts\" || exit 0"    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "start": "concurrently --kill-others --success first --names \"NEXT,GENKIT\" \"node standalone-server/server.js -p 3000\" \"npm run genkit:prod\"",
+    "start:next": "node standalone-server/server.js -p 3000",
+    "start:genkit": "genkit start --port 3400 --tsx src/ai/dev.ts",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "patch-package",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.8.0",
@@ -70,5 +76,9 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
   }
 }

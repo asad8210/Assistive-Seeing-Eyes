@@ -2,52 +2,51 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install all dependencies for building
+# Copy package.json and package-lock.json (or yarn.lock)
 COPY package*.json ./
-RUN npm ci
 
-# Copy all source code (this will include the 'public' folder if it exists at the root)
+# Install all dependencies (including devDependencies for build)
+RUN npm install
+
+# Copy the rest of your application code
 COPY . .
 
-# Build Next.js app (this will use output: 'standalone' from next.config.ts)
-RUN npm run build # This creates .next/standalone and .next/static
+# Build the Next.js application
+# This will also generate the standalone output in .next/standalone
+RUN npm run build
 
-# Stage 2: Runner
+# Stage 2: Runner (Production)
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Set NODE_ENV to production
 ENV NODE_ENV production
 
-# Copy package.json and package-lock.json to install production dependencies
-# These dependencies (like concurrently, tsx, genkit, etc.) are needed to run the start command.
-COPY package*.json ./
-RUN npm ci --omit=dev
+# Install production dependencies only
+# concurrently and tsx are needed for the start script
+COPY --from=builder /app/package*.json ./
+RUN npm install --omit=dev
 
-# Copy the standalone Next.js server output from the builder stage.
-# This copies the contents of /app/.next/standalone from builder to /app in runner.
-# So, server.js will be at /app/server.js.
+# Copy the Next.js standalone output
 COPY --from=builder /app/.next/standalone ./
 
-# Copy the static assets (including those processed from the public folder by the build)
-# from the builder stage to the location the standalone server expects.
+# Copy the Next.js static assets
 COPY --from=builder /app/.next/static ./.next/static
 
-# Copy the original 'public' folder from the build context (your project's source).
-# The standalone Next.js server (invoked by server.js) will serve files from this ./public directory.
-# Ensure your project HAS a 'public' folder at its root if you rely on files here (e.g., favicon.ico, robots.txt).
-# If your 'public' folder is missing or empty, this line might cause issues if Docker strictness is high,
-# but usually, it's fine if the source folder is empty/missing.
+# Copy public folder from source
+# Ensure 'public' directory exists at the root of your project, even if empty (e.g., with a .gitkeep file)
 
 # Copy Genkit source files and other necessary runtime files for Genkit.
-# These are copied relative to the WORKDIR /app.
+# This ensures that 'genkit start' can find the flow files.
 COPY src/ai ./src/ai
+# package.json is already copied for npm install
+# If Genkit uses other config files at runtime, copy them too. e.g.,
+# COPY genkit.config.json ./genkit.config.json # If you have this
 COPY tsconfig.json ./tsconfig.json
-# If Genkit relies on .env for GOOGLE_API_KEY and you are not solely using Render's env vars:
 
+# Expose the port Next.js and Genkit will run on
 EXPOSE 3000
 EXPOSE 3400
 
-# Start Next.js standalone server (runs from /app/server.js)
-# and Genkit server (runs from /app, needs src/ai and tsconfig.json for paths).
-# `concurrently` needs to be in production dependencies.
-CMD ["concurrently", "node ./server.js", "genkit start --port 3400 --tsx src/ai/dev.ts"]
+# Start the application using the npm start script
+CMD ["npm", "run", "start"]

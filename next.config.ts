@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Removed output: 'export' for server-based deployment
+  output: 'standalone', // Ensures Next.js builds a standalone output
 };
 
 export default nextConfig;

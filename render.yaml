@@ -1,31 +1,62 @@
-# This file is a Render Blueprint that defines the services for your application.
-# Learn more at https://render.com/docs/blueprint-spec
-
+# Render Blueprint for Next.js + GenKit integrated deployment
 services:
   - type: web
-    name: assistive-seeing-eyes # Or your preferred service name
+    name: assistive-seeing-eyes
     runtime: docker
-    dockerfilePath: ./Dockerfile # Path to your Dockerfile
+    dockerfilePath: ./Dockerfile
+    region: oregon # Recommended for better latency (adjust as needed)
+    plan: free # Upgrade to 'starter' or higher for production
+    
+    # Environment Configuration
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
+      - key: GENKIT_PORT
+        value: 3400
       - key: NEXT_PUBLIC_GENKIT_API_BASE_URL
-        value: /genkit-api # Client will call this relative path for the integrated Genkit API
-      - key: GOOGLE_API_KEY # Your Genkit API key
-        sync: false # IMPORTANT: Set the value in Render's dashboard, not from repo
-    httpPort: 3000 # The port your Next.js app (served by standalone server.js) runs on inside the container
-    healthCheckPath: / # Root of your Next.js app for health checks
-    # Current strategy: Integrated deployment (Next.js frontend and Genkit backend in one service)
-    # The rewrite rule below enables this by proxying client-side requests to /genkit-api/...
-    # to the Genkit server running on port 3400 within the same container.
+        value: /genkit-api
+      - key: NEXT_PUBLIC_GOOGLE_APPLICATION_CREDENTIALS
+        sync: false # Set in Render dashboard
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GENKIT_PROJECT_ID
+        sync: false
+    
+    # Network Configuration
+    httpPort: 3000
+    healthCheckPath: /api/health
+    autoDeploy: true
+    
+    # Proxy Rules for Integrated Deployment
     rewrites:
-      - source: /genkit-api/(.*) # Match requests to /genkit-api/...
-        destination: http://localhost:3400/$1 # Proxy to Genkit on port 3400
+      - source: /genkit-api/(.*)
+        destination: http://localhost:3400/$1
+        stripPath: true
+    
+    # Resource Allocation (adjust based on needs)
+    resources:
+      cpu: 0.25 # Shared
+      memoryGB: 0.5 # 512MB - upgrade for production
+      swapSizeMB: 512
+    
+    # Advanced Options
+    buildCommand: npm install && npm run build
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1 # For persistent storage if needed
 
-    # An alternative strategy could be to deploy Next.js and Genkit as separate services.
-    # In that case:
-    # 1. This service would only run Next.js (or be a static site).
-    # 2. NEXT_PUBLIC_GENKIT_API_BASE_URL would point to the public URL of the separate Genkit service.
-    # 3. The rewrite rule above would not be needed for this Next.js service.
-    # 4. A new service would be defined in this render.yaml (or a separate one) for Genkit,
-    #    exposing its own public endpoint and handling CORS.
+# Uncomment if using separate GenKit service:
+#  - type: web
+#    name: genkit-service
+#    runtime: docker
+#    dockerfilePath: ./Dockerfile
+#    envVars:
+#      - key: NODE_ENV
+#        value: production
+#      - key: PORT
+#        value: 3400
+#    command: npm run genkit:prod
+#    httpPort: 3400

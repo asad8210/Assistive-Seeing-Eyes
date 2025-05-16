@@ -582,6 +582,7 @@ const AssistiveHomePage: React.FC = () => {
 
 
   const togglePersonalAssistant = useCallback(() => {
+    // Removed: if (isProcessingHoldRef.current) return; // This was blocking the call
     if (isAssistantActive) {
       stopPersonalAssistant();
     } else {

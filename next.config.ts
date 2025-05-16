@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: 'standalone', // Ensures Next.js builds a standalone output
+  output: 'standalone', // Ensures Next.js builds a standalone output for Docker
 };
 
 export default nextConfig;

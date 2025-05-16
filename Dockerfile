@@ -10,17 +10,11 @@ RUN apt-get update && \
 # Copy package files first for better caching
 COPY package*.json ./
 
-# Copy patches only if they exist
-COPY patches/ ./patches/ || true
-
 # Install all dependencies (including devDependencies for build)
 RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
-
-# Apply patches if they exist and are non-empty
-RUN if [ -d "./patches" ] && [ "$(ls -A ./patches)" ]; then npx patch-package; else echo "No patches to apply"; fi
 
 # Build the Next.js application
 RUN npm run build
@@ -51,8 +45,7 @@ COPY --from=builder /app/package*.json ./
 # Create directory structure
 RUN mkdir -p \
     ./standalone-server/.next/static \
-    ./src/ai \
-    /data
+    ./src/ai
 
 # Copy built application files
 COPY --from=builder /app/.next/standalone ./standalone-server

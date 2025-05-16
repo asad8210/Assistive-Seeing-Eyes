@@ -5,11 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
-    "genkit:dev": "node ./node_modules/genkit-cli/bin/genkit.js start --tsx src/ai/dev.ts",
-    "genkit:watch": "node ./node_modules/genkit-cli/bin/genkit.js start --tsx --watch src/ai/dev.ts",
+    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
+    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
     "start": "concurrently --kill-others --names \"NEXT,GENKIT\" \"node ./server.js -p 3000\" \"node ./node_modules/genkit-cli/bin/genkit.js start --port 3400 --tsx src/ai/dev.ts\"",
     "lint": "next lint",
+    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
+    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

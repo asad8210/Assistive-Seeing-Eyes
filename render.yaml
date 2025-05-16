@@ -11,8 +11,8 @@ services:
         value: production
       - key: NEXT_PUBLIC_GENKIT_API_BASE_URL
         value: /genkit-api # Client will call this relative path for the integrated Genkit API
-      - key: AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU # Your Genkit API key
-        sync: false # IMPORTANT: Set the value in Render's dashboard, not from repo
+      - key: GOOGLE_API_KEY
+        value: AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU # API Key directly in the file (Security Warning!)
     httpPort: 3000 # The port your Next.js app (served by standalone server.js) runs on inside the container
     healthCheckPath: / # Root of your Next.js app for health checks
     # Current strategy: Integrated deployment (Next.js frontend and Genkit backend in one service)
@@ -29,4 +29,3 @@ services:
     # 3. The rewrite rule above would not be needed for this Next.js service.
     # 4. A new service would be defined in this render.yaml (or a separate one) for Genkit,
     #    exposing its own public endpoint and handling CORS.
-#AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU

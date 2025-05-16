@@ -37,7 +37,6 @@ COPY --from=builder /app/.next/static ./.next/static
 # Ensure your project HAS a 'public' folder at its root if you rely on files here (e.g., favicon.ico, robots.txt).
 # If your 'public' folder is missing or empty, this line might cause issues if Docker strictness is high,
 # but usually, it's fine if the source folder is empty/missing.
-COPY public ./public
 
 # Copy Genkit source files and other necessary runtime files for Genkit.
 # These are copied relative to the WORKDIR /app.

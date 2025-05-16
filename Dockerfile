@@ -1,5 +1,5 @@
 # Stage 1: Builder - Install dependencies and build the application
-FROM node:20-slim AS builder
+FROM node:20-s pursued slim AS builder
 WORKDIR /app
 
 # Install system dependencies required for TensorFlow.js and other packages
@@ -49,7 +49,8 @@ COPY --from=builder /app/package*.json ./
 # Create directory structure
 RUN mkdir -p \
     ./standalone-server/.next/static \
-    ./src/ai
+    ./src/ai \
+    /data  # Add persistent storage mount point for Render
 
 # Copy built application files
 COPY --from=builder /app/.next/standalone ./standalone-server
@@ -66,7 +67,7 @@ RUN ls -la \
     standalone-server/server.js \
     src/ai/dev.ts
 
-# Health check (adjust based on your health endpoint)
+# Health check (matches Render healthCheckPath)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/api/health || exit 1
 

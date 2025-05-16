@@ -10,23 +10,23 @@ services:
         value: /genkit-api # Client will call this relative path
       - key: AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU # Your Genkit API key
         sync: false # IMPORTANT: Set the value in Render's dashboard, not from repo
-    httpPort: 3000 # The port your Next.js app (served by `next start`) runs on inside the container
+    httpPort: 3000 # The port your Next.js app (served by standalone server.js) runs on inside the container
     healthCheckPath: / # Root of your Next.js app for health checks
     rewrites:
       - source: /genkit-api/(.*) # Match requests to /genkit-api/...
         destination: http://localhost:3400/$1 # Proxy to Genkit on port 3400
+    # buildFilter: # Optional: To control when Render rebuilds
+    #   paths:
+    #     - "src/**"
+    #     - "public/**" # If you have a public folder
+    #     - "package.json"
+    #     - "package-lock.json"
+    #     - "next.config.ts" # or .js
+    #     - "tsconfig.json"
+    #     - "Dockerfile"
+    #     - ".dockerignore"
+    #     - "render.yaml"
+    #   ignoredPaths:
+    #     - "README.md"
 
-# plan: free # Or your desired plan
-# region: oregon # Or your preferred region
-# buildFilter:
-#   paths:
-#     - "src/**"
-#     - "public/**"
-#     - "package.json"
-#     - "next.config.js"
-#     - "tsconfig.json"
-#     - "Dockerfile"
-#     - ".dockerignore"
-#     - "render.yaml"
-#   ignoredPaths:
-#     - "README.md"
+AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU

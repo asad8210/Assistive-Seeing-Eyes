@@ -39,7 +39,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 
 # Conditionally copy genkit.config.json if it exists
 # Docker has no conditional COPY; workaround is to ignore if absent via build args or copying a default file
-COPY --from=builder --chown=nextjs:nodejs /app/genkit.config.json ./genkit.config.json
 
 # Set to non-root user
 USER nextjs

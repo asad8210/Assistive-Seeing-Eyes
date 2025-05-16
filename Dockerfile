@@ -44,7 +44,6 @@ COPY public ./public
 COPY src/ai ./src/ai
 COPY tsconfig.json ./tsconfig.json
 # If Genkit relies on .env for GOOGLE_API_KEY and you are not solely using Render's env vars:
-COPY .env ./.env
 
 EXPOSE 3000
 EXPOSE 3400

@@ -3,46 +3,50 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files and install all dependencies (including devDependencies)
+# Install dependencies (including devDependencies)
 COPY package*.json ./
 RUN npm install
 
-# Copy the full application code
+# Copy all source code
 COPY . .
 
-# Build the Next.js application (standalone output will be created)
+# Build the Next.js application
 RUN npm run build
 
-# Stage 2: Runner - Production Image
+# Stage 2: Runner
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+# Set production environment
 ENV NODE_ENV production
 
-# Create a non-root user for security
+# Create non-root user
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
-# Copy package files and install only production dependencies
+# Copy only required files for production
 COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts
 
-# Copy Next.js standalone server and static assets
+# Copy standalone Next.js server build
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./standalone-server
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./standalone-server/.next/static
 
-# Copy Genkit source files
-COPY --chown=nextjs:nodejs src/ai ./src/ai
-# Optional: Only include if the file exists
-# COPY --chown=nextjs:nodejs genkit.config.json ./genkit.config.json
-COPY --chown=nextjs:nodejs tsconfig.json ./tsconfig.json
+# Copy Genkit-specific files
+COPY --from=builder --chown=nextjs:nodejs /app/src/ai ./src/ai
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 
-# Use non-root user
+# Conditionally copy genkit.config.json if it exists
+# Docker has no conditional COPY; workaround is to ignore if absent via build args or copying a default file
+COPY --from=builder --chown=nextjs:nodejs /app/genkit.config.json ./genkit.config.json
+
+# Set to non-root user
 USER nextjs
 
+# Expose ports
 EXPOSE 3000
 EXPOSE 3400
 
-# Start the Next.js + Genkit application
+# Start script using concurrently (Next.js + Genkit)
 CMD ["npm", "run", "start"]

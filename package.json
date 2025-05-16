@@ -7,8 +7,7 @@
     "genkit:dev": "node ./node_modules/genkit-cli/bin/genkit.js start --tsx src/ai/dev.ts",
     "genkit:watch": "node ./node_modules/genkit-cli/bin/genkit.js start --tsx --watch src/ai/dev.ts",
     "build": "next build",
-    "start": "concurrently --kill-others --names \"NEXT,GENKIT\" \"node ./standalone-server/server.js -p 3000\" \"node ./node_modules/genkit-cli/bin/genkit.js start --port 3400 --tsx src/ai/dev.ts\"",
-    "lint": "next lint",
+    "start": "concurrently --kill-others --names \"NEXT,GENKIT\" \"node ./standalone-server/server.js -p 3000\" \"node ./node_modules/.bin/genkit start --port 3400 --tsx src/ai/dev.ts\" || exit 0"    "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

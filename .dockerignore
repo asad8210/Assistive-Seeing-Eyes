@@ -1,20 +1,77 @@
-Dockerfile
-.dockerignore
-node_modules
-npm-debug.log
-README.md
-.next
-out
-.env
-.env*.local
-.vscode
-*.tgz
+# General ignores
+.DS_Store
 *.log
-# Git files
+*.md
+*.pem
+.editorconfig
 .git
 .gitignore
+.idea
+.vscode
+*.env
+.env.local
+.npmrc
 
-# Capacitor files (if you were using it, but good to keep for general .dockerignore)
-android/
-ios/
-capacitor.config.*
+# Dependency directories
+node_modules
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Testing and coverage
+/coverage
+*.lcov
+
+# Next.js specific
+.next
+/out
+.next/cache
+
+# Build outputs
+/dist
+/build
+
+# Debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# GenKit development files
+.genkit/*
+genkit-debug.log
+
+# Firebase debug logs
+firebase-debug.log
+firestore-debug.log
+
+# Local development files
+.turbo
+.husky
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# System Files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Custom project ignores
+/patches/*.patch
+!patches/necessary-patch.patch  # Keep specific patches if needed

@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: assistive-visions # Or your preferred service name
+    runtime: docker
+    dockerfilePath: ./Dockerfile # Path to your Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_GENKIT_API_BASE_URL
+        value: /genkit-api # Client will call this relative path
+      - key: AIzaSyDrnk2NEr-OwEM04CnXGsex9_OUX9Yf2CU # Your Genkit API key
+        sync: false # IMPORTANT: Set the value in Render's dashboard, not from repo
+    httpPort: 3000 # The port your Next.js app (served by `next start`) runs on inside the container
+    healthCheckPath: / # Root of your Next.js app for health checks
+    rewrites:
+      - source: /genkit-api/(.*) # Match requests to /genkit-api/...
+        destination: http://localhost:3400/$1 # Proxy to Genkit on port 3400
+
+# plan: free # Or your desired plan
+# region: oregon # Or your preferred region
+# buildFilter:
+#   paths:
+#     - "src/**"
+#     - "public/**"
+#     - "package.json"
+#     - "next.config.js"
+#     - "tsconfig.json"
+#     - "Dockerfile"
+#     - ".dockerignore"
+#     - "render.yaml"
+#   ignoredPaths:
+#     - "README.md"

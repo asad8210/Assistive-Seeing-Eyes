@@ -4,8 +4,8 @@ services:
     name: assistive-seeing-eyes
     runtime: docker
     dockerfilePath: ./Dockerfile
-    region: oregon # Adjust based on user location
-    plan: free # Upgrade to 'starter' for production
+    region: oregon # Adjust based on user location (e.g., frankfurt, singapore)
+    plan: free # Upgrade to 'starter' for production (0.5 CPU, 1GB RAM)
 
     # Environment Configuration
     envVars:
@@ -35,7 +35,7 @@ services:
         destination: http://localhost:3400/$1
         stripPath: true
 
-    # Resource Allocation (upgrade for production)
+    # Resource Allocation
     resources:
       cpu: 0.25 # Consider 0.5 for starter plan
       memoryGB: 0.5 # Consider 1GB for starter plan

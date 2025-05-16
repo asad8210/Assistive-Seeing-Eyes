@@ -1,45 +1,45 @@
 # Render Blueprint for Next.js + GenKit integrated deployment
-services:
-  - type: web
-    name: assistive-seeing-eyes
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    region: oregon # Adjust based on user location (e.g., frankfurt, singapore)
-    plan: free # Upgrade to 'starter' for production (0.5 CPU, 1GB RAM)
+  services:
+    - type: web
+      name: assistive-seeing-eyes
+      runtime: docker
+      dockerfilePath: ./Dockerfile
+      region: oregon # Adjust based on user location (e.g., frankfurt, singapore)
+      plan: free # Upgrade to 'starter' for production (0.5 CPU, 1GB RAM)
 
-    # Environment Configuration
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 3000
-      - key: GENKIT_PORT
-        value: 3400
-      - key: NEXT_PUBLIC_GENKIT_API_BASE_URL
-        value: /genkit-api
-      - key: NEXT_PUBLIC_GOOGLE_APPLICATION_CREDENTIALS
-        sync: false # Set in Render dashboard (e.g., JSON content)
-      - key: GOOGLE_API_KEY
-        sync: false # Set in Render dashboard
-      - key: GENKIT_PROJECT_ID
-        sync: false # Set in Render dashboard
+      # Environment Configuration
+      envVars:
+        - key: NODE_ENV
+          value: production
+        - key: PORT
+          value: 3000
+        - key: GENKIT_PORT
+          value: 3400
+        - key: NEXT_PUBLIC_GENKIT_API_BASE_URL
+          value: /genkit-api
+        - key: NEXT_PUBLIC_GOOGLE_APPLICATION_CREDENTIALS
+          sync: false # Set in Render dashboard (e.g., JSON content)
+        - key: GOOGLE_API_KEY
+          sync: false # Set in Render dashboard
+        - key: GENKIT_PROJECT_ID
+          sync: false # Set in Render dashboard
 
-    # Network Configuration
-    httpPort: 3000
-    healthCheckPath: /api/health
-    autoDeploy: true
+      # Network Configuration
+      httpPort: 3000
+      healthCheckPath: /api/health
+      autoDeploy: true
 
-    # Proxy Rules for Integrated Deployment
-    rewrites:
-      - source: /genkit-api/(.*)
-        destination: http://localhost:3400/$1
-        stripPath: true
+      # Proxy Rules for Integrated Deployment
+      rewrites:
+        - source: /genkit-api/(.*)
+          destination: http://localhost:3400/$1
+          stripPath: true
 
-    # Resource Allocation
-    resources:
-      cpu: 0.25 # Consider 0.5 for starter plan
-      memoryGB: 0.5 # Consider 1GB for starter plan
-      swapSizeMB: 512
+      # Resource Allocation
+      resources:
+        cpu: 0.25 # Consider 0.5 for starter plan
+        memoryGB: 0.5 # Consider 1GB for starter plan
+        swapSizeMB: 512
 
-    # Build
-    buildCommand: npm install && npm run build
+      # Build
+      buildCommand: npm install && npm run build

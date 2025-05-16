@@ -1,8 +1,8 @@
 .git
-node_modules
-.next
-*.md
-.env
-.env.local
-.env.development
-.env.production
+  node_modules
+  .next
+  *.md
+  .env
+  .env.local
+  .env.development
+  .env.production

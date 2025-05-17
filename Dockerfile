@@ -1,73 +1,52 @@
-# Stage 1: Builder - Install dependencies and build the application
-  FROM node:20-slim AS builder
-  WORKDIR /app
+# Stage 1: Builder
+FROM node:20-alpine AS builder
 
-  # Install system dependencies required for TensorFlow.js and other packages
-  RUN apt-get update && \
-      apt-get install -y python3 make g++ && \
-      rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-  # Copy package files first for better caching
-  COPY package*.json ./
+# Install dependencies (including devDependencies)
+COPY package*.json ./
+RUN npm install
 
-  # Install all dependencies (including devDependencies for build)
-  RUN npm install --legacy-peer-deps
+# Copy all source code
+COPY . .
 
-  # Copy the rest of the application code
-  COPY . .
+# Build the Next.js application
+RUN npm run build
 
-  # Build the Next.js application
-  RUN npm run build
+# Stage 2: Runner
+FROM node:20-alpine AS runner
 
-  # Stage 2: Runner - Production optimized image
-  FROM node:20-slim AS runner
-  WORKDIR /app
+WORKDIR /app
 
-  ENV NODE_ENV=production
-  ENV PORT=3000
-  ENV GENKIT_PORT=3400
+# Set production environment
+ENV NODE_ENV production
 
-  # Install system dependencies required for runtime
-  RUN apt-get update && \
-      apt-get install -y --no-install-recommends \
-      # Required for TensorFlow.js
-      libgomp1 \
-      # Required for image processing
-      libgl1 \
-      # Required for health check
-      curl && \
-      rm -rf /var/lib/apt/lists/*
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nextjs
 
-  # Copy production node_modules from builder
-  COPY --from=builder /app/node_modules ./node_modules
-  COPY --from=builder /app/package*.json ./
+# Copy only required files for production
+COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts
 
-  # Create directory structure
-  RUN mkdir -p \
-      ./standalone-server/.next/static \
-      ./src/ai
+# Copy standalone Next.js server build
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./standalone-server
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./standalone-server/.next/static
 
-  # Copy built application files
-  COPY --from=builder /app/.next/standalone ./standalone-server
-  COPY --from=builder /app/.next/static ./standalone-server/.next/static
+# Copy Genkit-specific files
+COPY --from=builder --chown=nextjs:nodejs /app/src/ai ./src/ai
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 
-  # Copy required files for GenKit
-  COPY --from=builder /app/src/ai ./src/ai
-  COPY --from=builder /app/tsconfig.json ./
-  COPY --from=builder /app/genkit.config.js ./
+# Conditionally copy genkit.config.json if it exists
+# Docker has no conditional COPY; workaround is to ignore if absent via build args or copying a default file
+COPY --from=builder --chown=nextjs:nodejs /app/genkit.config.json ./genkit.config.json
 
-  # Verify critical files exist
-  RUN ls -la \
-      node_modules/genkit-cli/bin/genkit.js \
-      standalone-server/server.js \
-      src/ai/dev.ts
+# Set to non-root user
+USER nextjs
 
-  # Health check (matches Render healthCheckPath)
-  HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-      CMD curl -f http://localhost:3000/api/health || exit 1
+# Expose ports
+EXPOSE 3000
+EXPOSE 3400
 
-  # Expose ports
-  EXPOSE 3000 3400
-
-  # Run the application
-  CMD ["npm", "run", "start"]
+# Start script using concurrently (Next.js + Genkit)
+CMD ["npm", "run", "start"]

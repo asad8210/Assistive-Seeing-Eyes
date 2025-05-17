@@ -1,30 +1,13 @@
-# render.yaml – Render Blueprint for Next.js + Genkit Docker App
 services:
   - type: web
-    name: assistive-seeing-eyes
-    runtime: docker
+    name: next-genkit-app
+    env: docker
+    plan: free
     dockerfilePath: ./Dockerfile
-    region: oregon # or 'frankfurt', 'singapore', etc.
-    plan: free # Change to 'starter' or higher for production
-
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
-      - key: GENKIT_PORT
-        value: 3400
-      - key: NEXT_PUBLIC_GENKIT_API_BASE_URL
-        value: /genkit-api
-      - key: NEXT_PUBLIC_GOOGLE_APPLICATION_CREDENTIALS
-        sync: false # Set in Render dashboard
-      - key: GOOGLE_API_KEY
-        sync: false # Set in Render dashboard
-      - key: GENKIT_PROJECT_ID
-        sync: false # Set in Render dashboard
-
-    autoDeploy: true
-
+      - key: GEMINI_API_KEY
+        sync: false
     ports:
-      - port: 3000 # Next.js
-      - port: 3400 # Genkit
+      - 9002

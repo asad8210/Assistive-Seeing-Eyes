@@ -1,8 +1,11 @@
+node_modules
+npm-debug.log
 .git
-  node_modules
-  .next
-  *.md
-  .env
-  .env.local
-  .env.development
-  .env.production
+.gitignore
+.env
+*.md
+*.tsbuildinfo
+.next
+out
+build
+coverage

@@ -1,23 +1,21 @@
-# Use official Node.js 20 image as base
-FROM node:20-alpine
+# Base image with Node.js 18
+FROM node:18-alpine AS base
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Install dependencies only when needed
-COPY package.json package-lock.json* ./ 
-
 # Install dependencies
-RUN npm install --production
+COPY package.json package-lock.json* ./
+RUN npm install
 
-# Copy rest of the app source code
+# Copy rest of the app
 COPY . .
 
-# Build the Next.js app
+# Build the Next.js project
 RUN npm run build
 
-# Expose port the app runs on
-EXPOSE 3000
+# Expose the port (matches your `dev` script: -p 9002)
+EXPOSE 9002
 
-# Start the Next.js server in production mode
+# Run Next.js server
 CMD ["npm", "start"]

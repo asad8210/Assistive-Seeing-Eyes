@@ -3,11 +3,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies (including devDependencies)
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy all source code
+# Copy the rest of the application code
 COPY . .
 
 # Build the Next.js application
@@ -18,35 +18,26 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Set production environment
 ENV NODE_ENV production
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 nextjs
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
-# Copy only required files for production
 COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts
 
-# Copy standalone Next.js server build
+# Copy built app from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./standalone-server
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./standalone-server/.next/static
 
-# Copy Genkit-specific files
-COPY --from=builder --chown=nextjs:nodejs /app/src/ai ./src/ai
-COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
+# Copy essential runtime files
+COPY --chown=nextjs:nodejs src/ai ./src/ai
+COPY --chown=nextjs:nodejs genkit.config.json ./genkit.config.json
+COPY --chown=nextjs:nodejs tsconfig.json ./tsconfig.json
 
-# Conditionally copy genkit.config.json if it exists
-# Docker has no conditional COPY; workaround is to ignore if absent via build args or copying a default file
-COPY --from=builder --chown=nextjs:nodejs /app/genkit.config.json ./genkit.config.json
-
-# Set to non-root user
 USER nextjs
 
-# Expose ports
 EXPOSE 3000
 EXPOSE 3400
 
-# Start script using concurrently (Next.js + Genkit)
 CMD ["npm", "run", "start"]

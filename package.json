@@ -1,21 +1,17 @@
 {
-    "name": "nextn",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-      "dev": "next dev --turbopack -p 9002",
-      "genkit:dev": "genkit start --tsx src/ai/dev.ts",
-      "genkit:prod": "genkit start --port 3400 --tsx src/ai/dev.ts",
-      "genkit:watch": "genkit start --tsx --watch src/ai/dev.ts",
-      "build": "next build",
-      "start": "concurrently --kill-others --success first --names \"NEXT,GENKIT\" \"node standalone-server/server.js -p 3000\" \"npm run genkit:prod\"",
-      "start:next": "node standalone-server/server.js -p 3000",
-      "start:genkit": "genkit start --port 3400 --tsx src/ai/dev.ts",
-      "lint": "next lint",
-      "typecheck": "tsc --noEmit",
-      "prepare": "npm run build"
-    },
-    "dependencies": {
+  "name": "nextn",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 9002",
+    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
+    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
     "@genkit-ai/googleai": "^1.8.0",
     "@genkit-ai/next": "^1.8.0",
     "@hookform/resolvers": "^4.1.3",
@@ -50,7 +46,7 @@
     "firebase": "^11.7.0",
     "genkit": "^1.8.0",
     "lucide-react": "^0.475.0",
-    "next": "^15.3.2",
+    "next": "15.2.3",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",

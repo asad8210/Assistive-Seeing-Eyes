@@ -40,7 +40,11 @@ const AssistiveHomePage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const detectionIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const speechRecognitionRef = useRef<SpeechRecognition | null>(null);
+  // TypeScript: Use the correct SpeechRecognition type for browser compatibility
+  type BrowserSpeechRecognition = typeof window extends { webkitSpeechRecognition: infer T }
+    ? T extends new () => any ? InstanceType<T> : any
+    : any;
+  const speechRecognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingHoldRef = useRef<boolean>(false);
   const modelRef = useRef<cocoSsd.ObjectDetection | null>(null);

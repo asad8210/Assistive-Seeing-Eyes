@@ -26,7 +26,7 @@ export function startSpeechRecognition(
   onResult: (result: SpeechRecognitionResult) => void,
   onError: (error: any) => void,
   onEnd?: () => void
-): SpeechRecognition | null {
+): SpeechRecognitionResult | null {
   if (typeof window !== "undefined") {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;

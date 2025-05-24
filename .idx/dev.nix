@@ -7,6 +7,7 @@
   packages = [
     pkgs.nodejs_20
     pkgs.zulu
+    pkgs.watchman # Added for React Native file watching
   ];
   # Sets environment variables in the workspace
   env = {};
@@ -36,6 +37,10 @@
         web = {
           command = ["npm" "run" "dev" "--" "--port" "$PORT" "--hostname" "0.0.0.0"];
           manager = "web";
+        };
+        mobile = {
+          command = ["npm" "run" "start:mobile" "--" "--port" "$PORT" "--hostname" "0.0.0.0"];
+          manager = "web"; # Using web manager for mobile preview; adjust if using a dedicated mobile emulator
         };
       };
     };

@@ -1,5 +1,5 @@
 # Assistive SeeingEyes 👁️‍🗨️🔊
-Project Link: [https://github.com/asad8210/Assistive-Seeing-Eyes](https://assistive-seeing-eyes.vercel.app/)
+Deployment Link: [Assistive-SeeingEyes](https://assistive-seeing-eyes.vercel.app/)
 
 **Assistive SeeingEyes** is an innovative application designed to empower visually impaired individuals by providing real-time auditory feedback about their surroundings and a voice-activated personal assistant. Built with modern web technologies and powered by AI, it aims to enhance independence and safety.
 

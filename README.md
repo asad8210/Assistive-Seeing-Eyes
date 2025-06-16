@@ -194,9 +194,9 @@ This project is unlicensed and in the public domain. You are free to use, modify
 
 ## 📧 Contact
 
-Asad/IIT BHU Intern Project - beingasad47@gmail.com (Optional)
+Asad/IIT-BHU Intern-Project - beingasad47@gmail.com
 
-Project Link: [https://github.com/asad8210/Assistive-Seeing-Eyes](https://github.com/asad8210/Assistive-Seeing-Eyes)
+Project Link: [GitHub](https://github.com/asad8210/Assistive-Seeing-Eyes)
 
 
 ## 🙏 Acknowledgements 
